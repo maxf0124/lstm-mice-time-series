@@ -4,6 +4,7 @@ train BiDirectionalLSTM model for classification(as of now). (TODO: GIVE AN EXAM
 '''
 import calcom.io.CCDataSet as ccLoad
 import numpy as np
+import pdb
 
 class MiceLoader:
     def __init__(self):
@@ -15,6 +16,10 @@ class MiceLoader:
         self.data_dict = None
         # CC dataset
         self.ccd = None
+        # full time series
+        self.data_dict_ts = None
+        # fft smooth coefficients
+        self.num_coeffs = 100
 
     def load_ccd(self, path):
         self.ccd = ccLoad(path)
@@ -41,6 +46,17 @@ class MiceLoader:
                           for name,idx in zip(self.ccd.get_attr_values('mouse_id',idx=lineIdx),lineIdx)}
         return self.data_dict
 
+    def get_ccDataInDict_full(self,CCLines):
+        '''
+        This function takes in CClines and return dictionary contains the full time series data
+        :param CCLines: A list of CC lines
+        :return: dict_ts: A dictionary: key values are mouse names, each item is a 1-d array(full time series corresponding to that mouse)
+        '''
+        self.CCLines = CCLines
+        lineIdx = self.ccd.find_attr_by_value('line', self.CCLines)
+        self.data_dict_ts = {name: self.get_full_time_series(idx) for name,idx in zip(self.ccd.get_attr_values('mouse_id',idx=lineIdx),lineIdx)}
+        return self.data_dict_ts
+
     def get_mice_data(self,idx):
         '''
         This function takes in an index in self.ccd and output list: [Data,Label,Interval]
@@ -63,6 +79,17 @@ class MiceLoader:
         parsed_data, labels, intervals = self.parse_data(non_nan_data,time_idx,infection_time)
         return [parsed_data, labels, intervals]
 
+    def get_full_time_series(self,idx):
+        """
+        This function takes in an idx in self.ccd and output full time series
+        :param idx: index of data poitns in ccd dataset
+        :return: 1-d array: full time series
+        """
+        data_mat = self.ccd.generate_data_matrix(idx = [idx])
+        non_nan_data, time_idx = self.clean_data(data_mat[0,0,:])
+        # smooth data
+        return non_nan_data
+
     def clean_data(self, time_series):
         '''
         Clean nan value and keep time steps
@@ -71,6 +98,7 @@ class MiceLoader:
         '''
         non_nan_idx = ~np.isnan(time_series)
         non_nan_array, idx = time_series[non_nan_idx] ,np.arange(len(time_series))[non_nan_idx]
+        non_nan_array =self.smooth_time_series(non_nan_array,self.num_coeffs)
         return non_nan_array, idx
 
     def parse_data(self, data_mat, raw_idx, infection_time):
@@ -110,3 +138,15 @@ class MiceLoader:
             embed_data.append(embed_i)
             new_idx.append(raw_idx[idx[-1]])
         return np.array(embed_data), np.array(new_idx)
+
+    def smooth_time_series(self,x,num_coefs):
+        '''
+        This function takes in a time series data, output a smooth version by pass filter
+        :param x: 1-d array
+        :param num_coefs: integer first num_coefs are kept and the rest is set to be zero
+        :return: smooth_x: 1-d array , smoothed version of x
+        '''
+        rbf = np.fft.rfft(x)
+        rbf[num_coefs:] = 0
+        smooth_x = np.fft.irfft(rbf)
+        return smooth_x
