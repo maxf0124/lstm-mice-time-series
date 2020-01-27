@@ -1,6 +1,6 @@
 #import calcom
 import BiDirectionalLSTM as biLstm
-import pdb
+#import pdb
 import torch
 import torch.nn as nn
 import numpy as np
@@ -15,8 +15,8 @@ loader = loadMice.MiceLoader()
 loader.load_ccd(path)
 
 lineName = ['CC001']
-segment_interval = 100
-embedding = [5,30]
+segment_interval = 500
+embedding = [2,60]
 miceDict = loader.get_ccDataInDict('CC001',segment_interval,embedding)
 # ----------------------------Prepare mice Data --------------------------------
 
@@ -31,11 +31,10 @@ def create_inout_seq(miceDict):
 
 
 inout_seq = create_inout_seq(miceDict)
-#pdb.set_trace()
-batch_size = 10
-batch_num = 80
+batch_size = 60
+batch_num = 5
 train_num = batch_size * batch_num
-test_num =130
+test_num =10
 
 
 def create_batch_data(inout_seq,test_num,batch_num,batch_size):
@@ -55,7 +54,7 @@ def create_batch_data(inout_seq,test_num,batch_num,batch_size):
 
 
 batch_train,batch_train_label = create_batch_data(inout_seq,test_num,batch_num,batch_size)
-pdb.set_trace()
+
 
 # ----------------------------Run LSTM Model -----------------------------------
 hidden_layer_size = 128
@@ -66,29 +65,25 @@ print(lstm_model.parameters)
 optimizer = torch.optim.Adam(lstm_model.parameters(),lr=0.001)
 epoch = 1000
 
-#train_num = 150
-#test_num = 75
+
 
 for i in range(epoch):
     batch_err = 0
     for j in range(batch_num):
         seq, label = batch_train[j],batch_train_label[j]
-        #seq = seq.detach()
-        #label = label.detach()
         optimizer.zero_grad()
         lstm_model.hidden_cell=(torch.zeros(2, batch_size, hidden_layer_size),
                                 torch.zeros(2, batch_size, hidden_layer_size))
         lstm_model.hidden_cell2 = (torch.zeros(1, batch_size, hidden_layer_size),
                                    torch.zeros(1, batch_size, hidden_layer_size))
         ypred = lstm_model(seq)
-        #hidden.detach_()
-        #pdb.set_trace()
         single_loss = loss_function(ypred,label)
         single_loss.backward()
         optimizer.step()
         print('%5d th batch: error%5.3f'%(j,single_loss.item()))
         batch_err = batch_err + single_loss.item()
     print(ypred)
+    print(label)
 
     print('epoch:%5d, batch_error:%8.5f'%(i,batch_err))
 
@@ -97,7 +92,7 @@ true_label = []
 for k in range(train_num,test_num+train_num):
     test_seq, truth_label = inout_seq[k]
     lstm_model.hidden_cell = (torch.zeros(2, 1, hidden_layer_size),
-                                torch.zeros(2, 1, hidden_layer_size))
+                              torch.zeros(2, 1, hidden_layer_size))
     lstm_model.batch_size = 1
     pred_label.append(lstm_model(test_seq.reshape(1,segment_interval,1)).detach().numpy())
     true_label.append(truth_label.detach().numpy())

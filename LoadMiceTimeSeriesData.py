@@ -114,9 +114,9 @@ class MiceLoader:
         infection_idx = np.where(raw_idx>=infection_time)[0][0]
         T = self.time_interval
         # prepare pre and post infection data
-        pre_infection_data = [data_mat[np.arange(i*T,(i+1)*T)] for i in range((infection_idx-self.delay*self.embed_dim)//T)]
-        post_infection_data = [data_mat[np.arange(infection_idx+i*T,infection_idx+((i+1)*T))]
-                               for i in range((len(data_mat)-(self.delay*self.embed_dim)-infection_idx)//T)]
+        pre_infection_data = [data_mat[np.arange(i, i + T)] for i in range((infection_idx-self.delay*self.embed_dim))]
+        post_infection_data = [data_mat[np.arange(infection_idx+i, infection_idx+i+T)]
+                               for i in range((len(data_mat)-(self.delay*self.embed_dim)-infection_idx))]
         # return data and corresponding label [1,0]: pre-inoculation [0,1]:post-inoculation
         return pre_infection_data+post_infection_data, \
                [[1,0]]*len(pre_infection_data)+[[0,1]]*len(post_infection_data),\
