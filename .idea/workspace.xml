@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8419e997-cca9-410c-8571-ae9998095ec2" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/simpleLSTM.py" beforeDir="false" afterPath="$PROJECT_DIR$/simpleLSTM.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LoadMiceTimeSeriesData.py" beforeDir="false" afterPath="$PROJECT_DIR$/LoadMiceTimeSeriesData.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mice_time_series_example.py" beforeDir="false" afterPath="$PROJECT_DIR$/mice_time_series_example.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -24,7 +25,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/simpleLSTM.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="304">
@@ -39,8 +40,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/testLSTM.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="152">
-              <caret line="8" column="45" lean-forward="true" selection-start-line="8" selection-start-column="45" selection-end-line="8" selection-end-column="45" />
+            <state relative-caret-position="342">
+              <caret line="18" column="79" lean-forward="true" selection-start-line="18" selection-start-column="79" selection-end-line="18" selection-end-column="79" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
               </folding>
@@ -48,11 +49,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mice_time_series_example.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="418">
-              <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
+            <state relative-caret-position="-133">
+              <caret line="53" lean-forward="true" selection-start-line="53" selection-end-line="53" />
               <folding>
                 <element signature="e#15#49#0" expanded="true" />
               </folding>
@@ -63,10 +64,10 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LoadMiceTimeSeriesData.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2394">
-              <caret line="126" lean-forward="true" selection-start-line="126" selection-end-line="126" />
+            <state relative-caret-position="2831">
+              <caret line="149" column="27" lean-forward="true" selection-start-line="149" selection-start-column="27" selection-end-line="149" selection-end-column="27" />
               <folding>
-                <element signature="e#209#245#0" expanded="true" />
+                <element signature="e#210#246#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -108,6 +109,9 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>self.smooth</find>
+      <find>get_ccData</find>
+      <find>get</find>
+      <find>batch_num</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -122,10 +126,10 @@
         <option value="$PROJECT_DIR$/calculate_acc.py" />
         <option value="$PROJECT_DIR$/testLSTM.py" />
         <option value="$PROJECT_DIR$/sine_wave_example.py" />
-        <option value="$PROJECT_DIR$/LoadMiceTimeSeriesData.py" />
-        <option value="$PROJECT_DIR$/mice_time_series_example.py" />
         <option value="$PROJECT_DIR$/BiDirectionalLSTM.py" />
         <option value="$PROJECT_DIR$/simpleLSTM.py" />
+        <option value="$PROJECT_DIR$/LoadMiceTimeSeriesData.py" />
+        <option value="$PROJECT_DIR$/mice_time_series_example.py" />
       </list>
     </option>
   </component>
@@ -337,16 +341,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/LoadMiceTimeSeriesData.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2394">
-          <caret line="126" lean-forward="true" selection-start-line="126" selection-end-line="126" />
-          <folding>
-            <element signature="e#209#245#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sanity_check.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="114">
@@ -357,20 +351,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mice_time_series_example.py">
+    <entry file="file://$PROJECT_DIR$/testLSTM.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="418">
-          <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
+        <state relative-caret-position="342">
+          <caret line="18" column="79" lean-forward="true" selection-start-line="18" selection-start-column="79" selection-end-line="18" selection-end-column="79" />
           <folding>
-            <element signature="e#15#49#0" expanded="true" />
+            <element signature="e#0#12#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/testLSTM.py">
+    <entry file="file://$PROJECT_DIR$/simpleLSTM.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="152">
-          <caret line="8" column="45" lean-forward="true" selection-start-line="8" selection-start-column="45" selection-end-line="8" selection-end-column="45" />
+        <state relative-caret-position="304">
+          <caret line="16" column="55" selection-start-line="16" selection-start-column="55" selection-end-line="16" selection-end-column="55" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
           </folding>
@@ -387,12 +381,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/simpleLSTM.py">
+    <entry file="file://$PROJECT_DIR$/LoadMiceTimeSeriesData.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
-          <caret line="16" column="55" selection-start-line="16" selection-start-column="55" selection-end-line="16" selection-end-column="55" />
+        <state relative-caret-position="2831">
+          <caret line="149" column="27" lean-forward="true" selection-start-line="149" selection-start-column="27" selection-end-line="149" selection-end-column="27" />
           <folding>
-            <element signature="e#0#12#0" expanded="true" />
+            <element signature="e#210#246#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mice_time_series_example.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-133">
+          <caret line="53" lean-forward="true" selection-start-line="53" selection-end-line="53" />
+          <folding>
+            <element signature="e#15#49#0" expanded="true" />
           </folding>
         </state>
       </provider>
