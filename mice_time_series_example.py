@@ -1,6 +1,6 @@
 #import calcom
 import BiDirectionalLSTM as biLstm
-#import pdb
+import pdb
 import torch
 import torch.nn as nn
 import numpy as np
@@ -15,7 +15,7 @@ loader = loadMice.MiceLoader()
 loader.load_ccd(path)
 
 lineName = ['CC001']
-segment_interval = 500
+segment_interval = 120
 embedding = [2,60]
 miceDict = loader.get_ccDataInDict('CC001',segment_interval,embedding)
 # ----------------------------Prepare mice Data --------------------------------
@@ -25,26 +25,34 @@ def create_inout_seq(miceDict):
     input_seq = []
     for i in miceDict.keys():
         for j in range(len(miceDict[i][0])):
-            train_in,train_out = torch.from_numpy(np.array(miceDict[i][0][j])).float(), torch.from_numpy(np.array(miceDict[i][1][j])).float()
-            input_seq.append((train_in,train_out))
+            train_in, train_out = torch.from_numpy(np.array(miceDict[i][0][j])).float(), torch.from_numpy(np.array(miceDict[i][1][j])).float()
+            input_seq.append((train_in, train_out))
     return input_seq
 
 
 inout_seq = create_inout_seq(miceDict)
-batch_size = 60
-batch_num = 5
+pdb.set_trace()
+#switch_idx = []
+#for i in range(len(inout_seq)-1):
+#    if torch.norm(inout_seq[i][1]-inout_seq[i+1][1]) > 0.001:
+#        switch_idx.append(i + 1)
+#        continue
+#print(switch_idx)
+#pdb.set_trace()
+batch_size = 64
+batch_num = 248
 train_num = batch_size * batch_num
-test_num =10
+test_num =1
 
 
 def create_batch_data(inout_seq,test_num,batch_num,batch_size):
-    train_num = batch_num*batch_size
-    rand_idx = np.random.permutation(train_num)
-    inout_seq_permute = [inout_seq[i] for i in rand_idx]
-    #inout_seq_permute = inout_seq
+    #train_num = batch_num*batch_size
+    #rand_idx = np.random.permutation(train_num)
+    #inout_seq_permute = [inout_seq[i] for i in rand_idx]
+    inout_seq_permute = inout_seq
     batch_data = []
     batch_label = []
-    for i in range(batch_num):
+    for i in np.arange(batch_num):
         pair_i = inout_seq_permute[i*batch_size:(i+1)*batch_size]
         batch_i,label_i = [k[0].tolist() for k in pair_i],[ll[1].tolist() for ll in pair_i]
         # TODO: resize batch data for LSTM input
@@ -53,7 +61,7 @@ def create_batch_data(inout_seq,test_num,batch_num,batch_size):
     return torch.tensor(batch_data).float(),torch.tensor(batch_label).float()
 
 
-batch_train,batch_train_label = create_batch_data(inout_seq,test_num,batch_num,batch_size)
+batch_train,batch_train_label = create_batch_data(inout_seq, test_num,batch_num, batch_size)
 
 
 # ----------------------------Run LSTM Model -----------------------------------
@@ -65,11 +73,9 @@ print(lstm_model.parameters)
 optimizer = torch.optim.Adam(lstm_model.parameters(),lr=0.001)
 epoch = 1000
 
-
-
 for i in range(epoch):
     batch_err = 0
-    for j in range(batch_num):
+    for j in np.arange(batch_num):
         seq, label = batch_train[j],batch_train_label[j]
         optimizer.zero_grad()
         lstm_model.hidden_cell=(torch.zeros(2, batch_size, hidden_layer_size),
@@ -80,21 +86,21 @@ for i in range(epoch):
         single_loss = loss_function(ypred,label)
         single_loss.backward()
         optimizer.step()
-        print('%5d th batch: error%5.3f'%(j,single_loss.item()))
+        print('%5d th batch ---- error %8.6f'%(j,single_loss.item()))
         batch_err = batch_err + single_loss.item()
     print(ypred)
     print(label)
 
-    print('epoch:%5d, batch_error:%8.5f'%(i,batch_err))
+    print('epoch:%5d, batch_error: %8.5f'%(i,batch_err))
 
 pred_label = []
 true_label = []
-for k in range(train_num,test_num+train_num):
+for k in range(train_num, test_num+train_num):
     test_seq, truth_label = inout_seq[k]
     lstm_model.hidden_cell = (torch.zeros(2, 1, hidden_layer_size),
                               torch.zeros(2, 1, hidden_layer_size))
     lstm_model.batch_size = 1
-    pred_label.append(lstm_model(test_seq.reshape(1,segment_interval,1)).detach().numpy())
+    pred_label.append(lstm_model(test_seq.reshape(1, segment_interval,1)).detach().numpy())
     true_label.append(truth_label.detach().numpy())
 
 with open('pred_label.txt','wb') as fp:
