@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import numpy as np
+import os
 import pickle
 import LoadMiceTimeSeriesData as loadMice
 
@@ -14,7 +15,7 @@ loader = loadMice.MiceLoader()
 loader.load_ccd(path)
 
 lineName = ['CC001']
-segment_interval = 120
+segment_interval = 360
 embedding = [3, 30]  # time delayed embedding: [embedding dimension, delay]
 miceDict = loader.get_cc_data_in_dict('CC001', segment_interval, embedding)
 # ----------------------------Prepare mice Data --------------------------------
@@ -40,6 +41,7 @@ def create_inout_seq_single(mice_dict, mice_name, interval):
     return out_seq
 
 
+os.system('clear')
 # inout_seq = create_inout_seq(miceDict)
 name = list(miceDict.keys())[0]
 print('pick mice: %s' % name)
@@ -54,7 +56,7 @@ print('training number is %d, first positive index is %d' % (len(inout_seq), fir
 
 train_size = 10
 healthy_start_idx = 4
-sick_start_idx = first_sick_index+20
+sick_start_idx = first_sick_index+5
 healthy_train = inout_seq[healthy_start_idx:healthy_start_idx+train_size]
 sick_train = inout_seq[sick_start_idx:sick_start_idx+train_size]
 inout_seq = healthy_train + sick_train
@@ -69,7 +71,7 @@ ax1.set_xlabel('time')
 ax1.set_ylabel('standardized temp')
 ax2.set_xlabel('time')
 ax2.set_ylabel('standardized temp')
-plt.show()
+plt.savefig('training_data_plt.png')
 
 
 batch_size = train_size*2
@@ -94,15 +96,15 @@ def create_batch_data(inout_seq, batch_number, batch_volume):
 batch_train, batch_train_label = create_batch_data(inout_seq, batch_num, batch_size)
 
 # ----------------------------Run LSTM Model -----------------------------------
-hidden_layer_size = 256
+hidden_layer_size = 200
 layers = 3
 lstm_model = simpleLSTM.SimpleLSTM(batch_size, input_size=embedding[0], hidden_size=hidden_layer_size, output_size=2
                                    , num_layers=layers)
 lstm_model = lstm_model.float()
 loss_function = nn.BCELoss()
 print(lstm_model.parameters)
-optimizer = torch.optim.Adam(lstm_model.parameters(), lr=0.001)
-epoch = 1000
+optimizer = torch.optim.Adam(lstm_model.parameters(), lr=0.0001)
+epoch = 500
 
 for i in range(epoch):
     batch_err = 0
@@ -115,9 +117,9 @@ for i in range(epoch):
         single_loss = loss_function(ypred, label)
         single_loss.backward()
         optimizer.step()
-        print('%5d th batch ---- error %8.6f' % (j, single_loss.item()))
+        # print('%5d th batch ---- error %8.6f' % (j, single_loss.item()))
         batch_err = batch_err + single_loss.item()
-    #print('epoch:%5d, batch_error: %8.6f' % (i, batch_err))
+    print('epoch:%5d, batch_error: %8.6f' % (i, batch_err))
 print(ypred)
 
 """
