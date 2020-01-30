@@ -100,6 +100,7 @@ class MiceLoader:
         """
         non_nan_idx = ~np.isnan(time_series)
         non_nan_array, idx = time_series[non_nan_idx], np.arange(len(time_series))[non_nan_idx]
+        non_nan_array = self.standardize_time_series(non_nan_array)
         non_nan_array = self.smooth_time_series(non_nan_array, self.num_coeffs)
         return non_nan_array, idx
 
@@ -155,3 +156,12 @@ class MiceLoader:
         rbf[num_coefs:] = 0
         smooth_x = np.fft.irfft(rbf)
         return smooth_x
+
+    def standardize_time_series(self, x):
+        """
+        :param x: 1-d array time series data
+        :return: standardized time series data st_x = x-min/max-min
+        """
+        x_min, x_max = np.min(x), np.max(x)
+        st_x = (x-x_min)/(x_max-x_min)
+        return st_x
