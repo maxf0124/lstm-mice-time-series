@@ -16,7 +16,7 @@ loader.load_ccd(path)
 
 lineName = ['CC001']
 segment_interval = 60
-embedding = [1, 0]  # time delayed embedding: [embedding dimension, delay]
+embedding = [4, 60]  # time delayed embedding: [embedding dimension, delay]
 miceDict = loader.get_cc_data_in_dict('CC001', segment_interval, embedding)
 miceDict_full = loader.get_cc_data_in_dict_full('CC001')
 # ----------------------------Prepare mice Data --------------------------------
@@ -65,11 +65,13 @@ inout_seq = healthy_train + sick_train
 
 fig, axes = plt.subplots(nrows=2, ncols=train_size, sharey='all', figsize=(train_size*1.5, 4))
 for i in range(train_size):
-    axes[0, i].plot(healthy_train[i][0][:, 0], label="negative_%d" % i)
+    for j in range(embedding[0]):
+        axes[0, i].plot(healthy_train[i][0][:, j], label="negative_%d" % i)
     if i == 0:
         axes[0, i].set_xlabel('time')
         axes[0, i].set_ylabel('std. temp')
-    axes[1, i].plot(sick_train[i][0][:, 0], label="positive_%d" % i)
+    for j in range(embedding[0]):
+        axes[1, i].plot(sick_train[i][0][:, j], label="positive_%d" % i)
     if i == 0:
         axes[1, i].set_xlabel('time')
         axes[1, i].set_ylabel('std. temp')
@@ -111,14 +113,14 @@ batch_train, batch_train_label = create_batch_data(inout_seq, batch_num, batch_s
 
 # ----------------------------Run LSTM Model -----------------------------------
 hidden_layer_size = 512
-layers = 2
+layers = 3
 lstm_model = simpleLSTM.SimpleLSTM(batch_size, input_size=embedding[0], hidden_size=hidden_layer_size, output_size=2
                                    , num_layers=layers)
 lstm_model = lstm_model.float()
 loss_function = nn.BCELoss()
 print(lstm_model.parameters)
 optimizer = torch.optim.Adam(lstm_model.parameters(), lr=0.0001)
-epoch = 500
+epoch = 200
 
 for i in range(epoch):
     batch_err = 0
@@ -133,12 +135,20 @@ for i in range(epoch):
         optimizer.step()
         # print('%5d th batch ---- error %8.6f' % (j, single_loss.item()))
         batch_err = batch_err + single_loss.item()
+    if batch_err < 0.35:
+        break
     print('epoch:%5d, batch_error: %8.6f' % (i, batch_err))
 print(ypred)
 
-
-positive_label, negative_label = np.array([1, 0]), np.array([0, 1])
-
+# -----------------------------summarize training result----------------------------------------------------------------
+correct = 0
+for i in range(len(ypred)):
+    left = np.linalg.norm(np.array(ypred[i].detach())-np.array(label[i]))
+    right = np.linalg.norm(np.array(ypred[i].detach())-(1-np.array(label[i])))
+    if left < right:
+        correct += 1
+accuracy = correct/len(ypred)
+print('training accuracy is %5.4f' % accuracy)
 """
 pred_label = []
 true_label = []
