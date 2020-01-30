@@ -15,9 +15,10 @@ loader = loadMice.MiceLoader()
 loader.load_ccd(path)
 
 lineName = ['CC001']
-segment_interval = 360
-embedding = [3, 30]  # time delayed embedding: [embedding dimension, delay]
+segment_interval = 60
+embedding = [1, 0]  # time delayed embedding: [embedding dimension, delay]
 miceDict = loader.get_cc_data_in_dict('CC001', segment_interval, embedding)
+miceDict_full = loader.get_cc_data_in_dict_full('CC001')
 # ----------------------------Prepare mice Data --------------------------------
 
 
@@ -54,25 +55,38 @@ for i in range(len(train_labels)-1):
         break
 print('training number is %d, first positive index is %d' % (len(inout_seq), first_sick_index))
 
-train_size = 10
+train_size = 15
 healthy_start_idx = 4
-sick_start_idx = first_sick_index+5
+sick_start_idx = first_sick_index + 10
 healthy_train = inout_seq[healthy_start_idx:healthy_start_idx+train_size]
 sick_train = inout_seq[sick_start_idx:sick_start_idx+train_size]
 inout_seq = healthy_train + sick_train
 
-fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2)
-for i in range(train_size):
-    ax1.plot(healthy_train[i][0][:, 0], label="negative_%d" % i)
-    ax2.plot(sick_train[i][0][:, 0], label="positive_%d" % i)
-ax1.legend()
-ax2.legend()
-ax1.set_xlabel('time')
-ax1.set_ylabel('standardized temp')
-ax2.set_xlabel('time')
-ax2.set_ylabel('standardized temp')
-plt.savefig('training_data_plt.png')
 
+fig, axes = plt.subplots(nrows=2, ncols=train_size, sharey='all', figsize=(train_size*1.5, 4))
+for i in range(train_size):
+    axes[0, i].plot(healthy_train[i][0][:, 0], label="negative_%d" % i)
+    if i == 0:
+        axes[0, i].set_xlabel('time')
+        axes[0, i].set_ylabel('std. temp')
+    axes[1, i].plot(sick_train[i][0][:, 0], label="positive_%d" % i)
+    if i == 0:
+        axes[1, i].set_xlabel('time')
+        axes[1, i].set_ylabel('std. temp')
+#ax1.legend()
+#ax2.legend()
+plt.tight_layout()
+plt.savefig('training_data_plt.png')
+plt.close(fig)
+
+full_time_series = miceDict_full[name]
+fig2, ax_full = plt.subplots(nrows=1, ncols=1)
+ax_full.plot(full_time_series)
+ax_full.set_xlabel('index')
+ax_full.set_ylabel('tmp')
+ax_full.set_title('mice id: %s' % name)
+plt.savefig('full_train_data.png')
+plt.close(fig2)
 
 batch_size = train_size*2
 batch_num = 1
@@ -96,8 +110,8 @@ def create_batch_data(inout_seq, batch_number, batch_volume):
 batch_train, batch_train_label = create_batch_data(inout_seq, batch_num, batch_size)
 
 # ----------------------------Run LSTM Model -----------------------------------
-hidden_layer_size = 200
-layers = 3
+hidden_layer_size = 512
+layers = 2
 lstm_model = simpleLSTM.SimpleLSTM(batch_size, input_size=embedding[0], hidden_size=hidden_layer_size, output_size=2
                                    , num_layers=layers)
 lstm_model = lstm_model.float()
@@ -121,6 +135,9 @@ for i in range(epoch):
         batch_err = batch_err + single_loss.item()
     print('epoch:%5d, batch_error: %8.6f' % (i, batch_err))
 print(ypred)
+
+
+positive_label, negative_label = np.array([1, 0]), np.array([0, 1])
 
 """
 pred_label = []

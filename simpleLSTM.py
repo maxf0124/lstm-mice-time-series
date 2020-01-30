@@ -12,7 +12,7 @@ class SimpleLSTM(nn.Module):
         self.num_layers = num_layers
         # functions
         self.lstm = nn.LSTM(input_size=input_size, hidden_size=self.hidden_layer_size, num_layers=self.num_layers,
-                            batch_first=True, dropout=0)
+                            batch_first=True, dropout=0.2)
         self.linear = nn.Linear(in_features=self.hidden_layer_size, out_features=output_size, bias=True)
         self.hidden_cell = (torch.zeros(self.num_layers, self.batch_size, self.hidden_layer_size),
                             torch.zeros(self.num_layers, self.batch_size, self.hidden_layer_size))
